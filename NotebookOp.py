@@ -75,7 +75,8 @@ class NotebookOp(KubernetesPodOperator):
                                      cloud_cloud_archive=self.cos_dependencies_archive,
                                      cloud_bucket=self.cos_bucket,
                                      cloud_directory=self.cos_directory,
-                                     cloud_scraplocation=self.scrapbook
+                                     cloud_scraplocation=self.scrapbook,
+                                     notebook=self.notebook
                                      )
 
                              )
