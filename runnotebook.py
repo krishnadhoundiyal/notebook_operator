@@ -16,7 +16,10 @@ import argparse
 INOUT_SEPARATOR = ';'
 logger = logging.getLogger('explorer')
 T = TypeVar('T', bound='FileOpBase')
-
+"""
+    Usage as
+    python runnotebook.py --endpoint storage.googleapis.com --bucket airflow-notebooks-0123 --directory untitled --dependencies-archive file.tar.gz --file load_data.ipynb --outputs data/noaa-weather-data-jfk-airport/jfk_weather.csv;data/noaa-weather-data-jfk-airport/jfk_weather_cleaned.csv
+"""
 class FileOpBase(ABC):
     filepath=None
     @classmethod
@@ -124,6 +127,7 @@ class Utility(object):
         parser.add_argument('-f','--file',dest='filepath',required=True,help='File to be executed')
         parser.add_argument('-o', '--outputs', dest="outputs", help='Files to output to object store', required=False)
         parser.add_argument('-i', '--inputs', dest="inputs", help='Files to pull in from parent node', required=False)
+        parser.add_argument('-p', '--parameters', dest="parameters", help='Parameterized Notebook Configuration', type=str, required=False)
         parser.add_argument('-t', '--dependencies-archive', dest="dependencies-archive",
                             help='Archive containing notebook and dependency artifacts', required=True)
         #parser.add_argument('-s', '--scrapbook', dest="scrapbook", help='Store Scrapes', required=True)
@@ -146,7 +150,13 @@ class NotebookFileOp(FileOpBase):
         try:
             Utility.log_operation_info(f"procesing notebook using 'papermill {notebook} {notebook_output}'")
             import papermill
-            papermill.execute_notebook(notebook,notebook_output)
+            import json
+            config_params = None
+            import pdb;
+            pdb.set_trace()
+            if self.input_params.get("parameters"):
+                config_params=json.loads(self.input_params.get("parameters"))
+            papermill.execute_notebook(notebook,notebook_output,parameters=config_params)
             Utility.log_operation_info("Processing completed for the notebook")
             #NotebookFileOp.convert_to_html(notebook_output,notebook_html)
             self.put_file_to_object_storage(notebook_output,notebook)
@@ -169,8 +179,22 @@ class NotebookFileOp(FileOpBase):
         Utility.log_operation_info(f"completed converting {notebook_file} into html {html_file}")
         return html_file
 
-
-
+class PythonFileOp(FileOpBase):
+    def execute(self)->None:
+        python_script = os.path.basename(self.filepath)
+        python_script_name = python_script.replace('.py','')
+        python_script_log = python_script_name + ".log"
+        try:
+            Utility.log_operation_info(f"Exececuting python script '{python_script_name}'")
+            with open(python_script_log,"w") as log_file:
+                subprocess.run(['python',python_script],stdout=log_file,stderr=subprocess.STDOUT,check=True)
+            Utility.log_operation_info("Execution Completed")
+            self.put_file_to_object_storage(python_script_log)
+            self.process_outputs()
+        except Exception as ex:
+            logger.error("Unexpected error '{}'".format(sys.exc_info()[0]))
+            logger.error("Error Detauls '{}".format(ex))
+            raise ex
 
 
 def main():

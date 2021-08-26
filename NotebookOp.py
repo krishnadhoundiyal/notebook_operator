@@ -14,6 +14,7 @@ class NotebookOp(KubernetesPodOperator):
                  dependencies: str,
                  pipeline_output: Optional[List[str]]= None,
                  pipeline_inputs: Optional[List[str]] = None,
+                 pipeline_config_params: Optional[Dict] = None,
                  requirements_url: str = None,
                  bootstrap_script_url: str = None,
                  scrapbook: str= None,
@@ -46,6 +47,7 @@ class NotebookOp(KubernetesPodOperator):
         self.requirements_url = requirements_url
         self.pipeline_outputs = pipeline_output
         self.pipeline_inputs = pipeline_inputs
+        self.pipeline_config_params = pipeline_config_params
         self.scrapbook = scrapbook
         argument_list = [];
         # Create the Secret Object to load the Credentials to access the Cloud Storage
@@ -87,6 +89,8 @@ class NotebookOp(KubernetesPodOperator):
         if self.pipeline_outputs:
             outputs_str = self._artifact_list_to_str(self.pipeline_outputs)
             argument_list.append("--outputs '{}' ".format(outputs_str))
+        if self.pipeline_config_params:
+            argument_list.append("--parameters '{}'".format(self.pipeline_config_params))
 
         def _artifact_list_to_str(self, pipeline_array):
             trimmed_artifact_list = []
