@@ -1,0 +1,105 @@
+{
+                "name": "dag_runtime_generated_id7",
+                "pipeline_description": "Some pipeline to test few things!!",
+                "nodes": [
+                    {
+                        "name": "Start",
+                        "_type": "airflow.operators.dummy.DummyOperator",
+                        "parameters": {
+                            "task_id" : "1234343"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommand1",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id": "123434er",
+                            "bash_command": "echo test11"
+                        }
+                    },
+                    {
+                        "name": "End",
+                        "_type": "airflow.operators.dummy.DummyOperator",
+                        "parameters": {
+                                "task_id" : "1234343465"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommand",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "1234343467",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level3",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx_x1",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level3_1",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx1",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level4",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx_x1_x1",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level3_1_1",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx_x1_x2",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level3_1_2",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx_x1_x2_end",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level3_1_2-end",
+                            "bash_command": "echo test"
+                        }
+                    },
+                    {
+                        "name": "ExecuteCommandx11_x1",
+                        "_type": "airflow.operators.bash.BashOperator",
+                        "parameters": {
+                            "task_id" : "level4_1",
+                            "bash_command": "echo test"
+                        }
+                    }
+                ],
+                "connections": {
+                    "Start": ["ExecuteCommand", "ExecuteCommand1"],
+                    "ExecuteCommand1": ["ExecuteCommandx","ExecuteCommandx1"],
+                    "ExecuteCommandx" : ["ExecuteCommandx_x1"],
+                    "ExecuteCommandx_x1" : ["ExecuteCommandx_x1_x1","ExecuteCommandx_x1_x2"],
+                    "ExecuteCommandx_x1_x1" : ["ExecuteCommandx_x1_x2_end"],
+                    "ExecuteCommandx_x1_x2" : ["ExecuteCommandx_x1_x2_end"],
+                    "ExecuteCommandx_x1_x2_end" : ["End"],
+
+                    "ExecuteCommandx1": ["ExecuteCommandx11_x1"],
+                    "ExecuteCommandx11_x1" : ["End"],
+                    "ExecuteCommand": ["End"]
+                }
+}
